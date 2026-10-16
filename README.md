@@ -1,22 +1,28 @@
 <p align="center">
-  <img src="assets/icon.png" alt="Markdown to PDF" width="128" height="128">
+  <img src="assets/icon.png" alt="Markdown to PDF" width="96" height="96">
 </p>
 
 # Markdown to PDF
 
-Export Markdown to PDF locally in VS Code. Review the actual PDF before choosing a filename and save location.
+**A VS Code extension to preview and export Markdown as PDF — entirely on your computer.**
 
-[繁體中文](README.zh-TW.md) · [Development guide](CONTRIBUTING.md) · [Acceptance checklist](ACCEPTANCE.md)
+![VS Code Extension](https://img.shields.io/badge/VS_Code-Extension-007ACC)
+![Local Rendering](https://img.shields.io/badge/Rendering-Local-276749)
+[![MIT License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-## See it in action
+**[Install in VS Code](#build-and-install-from-source)** · [繁體中文](README.zh-TW.md) · [Development guide](CONTRIBUTING.md) · [Acceptance checklist](ACCEPTANCE.md)
 
-Right-click inside a Markdown editor and choose **Markdown: Export to PDF**.
+Syntax-highlighted code, math, Mermaid diagrams, and English / Traditional Chinese typography. Install from a VSIX; not yet published on the Marketplace.
+
+![Markdown editor and PDF preview inside Visual Studio Code](docs/images/pdf-preview.png)
+
+## How it works
+
+1. Right-click inside a Markdown editor → **Markdown: Export to PDF**.
+2. Review the PDF preview inside VS Code.
+3. Click **Confirm and Export**, then choose the filename and folder.
 
 ![Markdown editor context menu with the Export to PDF command](docs/images/context-menu.png)
-
-Review the result, then click **Confirm and Export** to choose the filename and folder.
-
-![Markdown source beside the PDF preview with Confirm and Export](docs/images/pdf-preview.png)
 
 Screenshots use VS Code’s **Quiet Light** theme with Chat hidden. The PDF uses its own styles, independently of your editor theme.
 

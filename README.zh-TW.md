@@ -1,22 +1,28 @@
 <p align="center">
-  <img src="assets/icon.png" alt="Markdown to PDF" width="128" height="128">
+  <img src="assets/icon.png" alt="Markdown to PDF" width="96" height="96">
 </p>
 
 # Markdown to PDF
 
-在 VS Code 本機將 Markdown 匯出成 PDF，先預覽實際結果，確認後再選擇檔名與儲存位置。
+**VS Code 擴充套件：在本機預覽 Markdown，確認後匯出 PDF。**
 
-[English](README.md) · [開發說明](CONTRIBUTING.md) · [驗收清單](ACCEPTANCE.md)
+![VS Code Extension](https://img.shields.io/badge/VS_Code-Extension-007ACC)
+![Local Rendering](https://img.shields.io/badge/Rendering-Local-276749)
+[![MIT License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-## 使用畫面
+**[安裝到 VS Code](#從原始碼建置並安裝)** · [English](README.md) · [開發說明](CONTRIBUTING.md) · [驗收清單](ACCEPTANCE.md)
 
-在 Markdown 編輯器內按右鍵，選擇 **Markdown: Export to PDF**。
+支援程式碼上色、數學公式、Mermaid 流程圖與中英文排版。目前以 VSIX 安裝，尚未上架 Marketplace。
+
+![VS Code 中的 Markdown 編輯器與 PDF 預覽](docs/images/pdf-preview.png)
+
+## 使用方式
+
+1. 在 Markdown 編輯器內按右鍵 → **Markdown: Export to PDF**。
+2. 在 VS Code 內檢查 PDF 預覽。
+3. 按 **Confirm and Export**，再選擇檔名與資料夾。
 
 ![Markdown 編輯器的右鍵匯出指令](docs/images/context-menu.png)
-
-確認 PDF 預覽後，按 **Confirm and Export**，再選擇檔名與資料夾。
-
-![Markdown 原始碼與 PDF 預覽並排顯示](docs/images/pdf-preview.png)
 
 截圖使用 VS Code 的 **Quiet Light** 主題，並關閉 Chat。PDF 使用獨立樣式，不受編輯器主題影響。
 
