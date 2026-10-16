@@ -10,5 +10,7 @@ package-lock.json
 tmp/**
 output/**
 assets/**
+!assets/icon.png
 .prettierignore
 .prettierrc.json
+docs/icon-design*.md

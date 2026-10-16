@@ -31,7 +31,7 @@ jobs:
       - run: npm run package
       - uses: actions/upload-artifact@v4
         with:
-          name: local-markdown-pdf-${{ matrix.os }}
+          name: markdown-to-pdf-${{ matrix.os }}
           path: |
             *.vsix
             output/pdf/*.pdf

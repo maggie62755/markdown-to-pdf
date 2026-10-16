@@ -1,8 +1,8 @@
 {
-  "name": "local-markdown-pdf",
-  "displayName": "Local Markdown PDF",
-  "description": "Export Markdown, math and Mermaid to PDF locally, with a preview before saving.",
-  "version": "0.1.7",
+  "name": "markdown-to-pdf",
+  "displayName": "Markdown to PDF",
+  "description": "Preview and export Markdown to PDF locally in VS Code.",
+  "version": "0.1.11",
   "publisher": "local-tools",
   "license": "MIT",
   "engines": {
@@ -31,7 +31,7 @@
       },
       {
         "command": "localMarkdownPdf.exportAs",
-        "title": "Markdown: Export PDF As\u2026"
+        "title": "Markdown: Export PDF As…"
       }
     ],
     "menus": {
@@ -44,7 +44,7 @@
       ]
     },
     "configuration": {
-      "title": "Local Markdown PDF",
+      "title": "Markdown to PDF",
       "properties": {
         "localMarkdownPdf.codeTheme": {
           "type": "string",
@@ -99,5 +99,14 @@
     "prettier": "3.9.10",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/maggie62755/markdown-to-pdf.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maggie62755/markdown-to-pdf/issues"
+  },
+  "homepage": "https://github.com/maggie62755/markdown-to-pdf#readme",
+  "icon": "assets/icon.png"
 }

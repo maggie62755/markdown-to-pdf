@@ -1,4 +1,8 @@
-# Local Markdown PDF
+<p align="center">
+  <img src="assets/icon.png" alt="Markdown to PDF" width="128" height="128">
+</p>
+
+# Markdown to PDF
 
 在 VS Code 本機將 Markdown 匯出成 PDF，先預覽實際結果，確認後再選擇檔名與儲存位置。
 
@@ -44,11 +48,11 @@
 
 ### 1. Clone 專案並安裝依賴
 
-從 GitHub 頁面的 **Code** 選單複製 HTTPS 網址，替換下方的 `<REPOSITORY_URL>`。指令會把專案下載到 `md_to_pdf` 資料夾，因此不受 GitHub 儲存庫名稱影響。
+下載儲存庫並進入專案資料夾：
 
 ```sh
-git clone "<REPOSITORY_URL>" md_to_pdf
-cd md_to_pdf
+git clone https://github.com/maggie62755/markdown-to-pdf.git
+cd markdown-to-pdf
 npm ci
 npm run prepare:browser
 ```
@@ -71,14 +75,16 @@ npm run package
 
 這個指令會自動建置程式、打包本機資源、檢查 Chromium 能否啟動，並在專案根目錄產生 VSIX。**不必另外執行 `npm run build`**；單獨執行 build 只會產生建置檔案，不會產生可安裝的 VSIX。
 
-| 建置平台            | 產生的檔案                             |
-| ------------------- | -------------------------------------- |
-| macOS Apple Silicon | `local-markdown-pdf-darwin-arm64.vsix` |
-| macOS Intel         | `local-markdown-pdf-darwin-x64.vsix`   |
-| Windows x64         | `local-markdown-pdf-win32-x64.vsix`    |
-| Ubuntu x64          | `local-markdown-pdf-linux-x64.vsix`    |
+| 建置平台            | 產生的檔案                          |
+| ------------------- | ----------------------------------- |
+| macOS Apple Silicon | `markdown-to-pdf-darwin-arm64.vsix` |
+| macOS Intel         | `markdown-to-pdf-darwin-x64.vsix`   |
+| Windows x64         | `markdown-to-pdf-win32-x64.vsix`    |
+| Ubuntu x64          | `markdown-to-pdf-linux-x64.vsix`    |
 
 ### 4. 安裝到 VS Code
+
+若先前已安裝 **Local Markdown PDF**，請先解除安裝，再安裝 **Markdown to PDF**。套件識別碼已變更，VS Code 會視為不同擴充套件；既有的 `localMarkdownPdf` 命令與設定 ID 則繼續保留。
 
 1. 開啟 VS Code，macOS 按 **Cmd+Shift+P**，Windows／Linux 按 **Ctrl+Shift+P**。
 2. 執行 **Extensions: Install from VSIX…**。
@@ -89,7 +95,7 @@ npm run package
 如果終端機已可使用 `code` 指令，也能直接安裝。例如 Apple Silicon Mac：
 
 ```sh
-code --install-extension ./local-markdown-pdf-darwin-arm64.vsix
+code --install-extension ./markdown-to-pdf-darwin-arm64.vsix
 ```
 
 其他平台請換成表格中對應的檔名。若找不到 `code` 指令，使用上面的 VS Code 選單方式即可。之後修改原始碼時，重新執行 `npm run package`，再安裝新產生的 VSIX。

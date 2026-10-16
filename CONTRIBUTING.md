@@ -70,7 +70,7 @@ Set `VSCODE_EXECUTABLE` for a different executable path. The script uses an isol
 npm run package
 ```
 
-This builds once, verifies bundled Chromium can launch, then creates `local-markdown-pdf-<platform>-<architecture>.vsix`. Use this command instead of invoking `vsce` directly. Supported package targets are `darwin-arm64`, `darwin-x64`, `win32-x64`, and `linux-x64`; prepare the browser on each target machine.
+This builds once, verifies bundled Chromium can launch, then creates `markdown-to-pdf-<platform>-<architecture>.vsix`. Use this command instead of invoking `vsce` directly. Supported package targets are `darwin-arm64`, `darwin-x64`, `win32-x64`, and `linux-x64`; prepare the browser on each target machine.
 
 The **Package** GitHub Actions workflow can be triggered manually after uploading the repository. Each native runner prepares Chromium, checks code, renders sample PDFs, exercises export/preview, and uploads artifacts. CI is not a replacement for installing the VSIX and testing native save dialogs and offline use on actual target devices.
 
@@ -78,7 +78,7 @@ The **Package** GitHub Actions workflow can be triggered manually after uploadin
 
 - Commit sources, the lockfile, configuration, fixtures, documentation, and `docs/images/`.
 - Generated folders (`node_modules/`, `dist/`, `.vendor/`, `tmp/`, `output/`), test coverage, caches, local environment files, personal editor settings, and VSIX files are ignored. Shared `.vscode/launch.json`, the lockfile, fixtures, and README screenshots belong in Git. Distribute VSIX files through GitHub Release assets or workflow artifacts instead of committing large binaries.
-- After choosing the repository URL, add the real `repository`, `bugs`, and `homepage` fields to `package.json`. No placeholder repository URL is used here.
-- Relative README links and screenshot paths work within GitHub. Local VSIX packaging preserves those paths and includes the screenshots.
+- `package.json` points to `maggie62755/markdown-to-pdf`. Keep `repository`, `bugs`, `homepage`, and README clone commands synchronized if the repository moves.
+- Keep relative links in the source README for GitHub. VSIX packaging rewrites them to public GitHub URLs on the `main` branch (raw URLs for images, blob URLs for documents). Push referenced images and documents before distributing a VSIX; the extension Details page needs network access to display these remote images. PDF preview and export remain local and offline.
 - Keep platform validation status accurate; Windows, Ubuntu and Intel Mac native acceptance is still pending.
 - This project currently uses the local publisher identifier `local-tools`; Marketplace publication requires a separately configured publisher and release process.

@@ -1,4 +1,8 @@
-# Local Markdown PDF
+<p align="center">
+  <img src="assets/icon.png" alt="Markdown to PDF" width="128" height="128">
+</p>
+
+# Markdown to PDF
 
 Export Markdown to PDF locally in VS Code. Review the actual PDF before choosing a filename and save location.
 
@@ -44,11 +48,11 @@ Prerequisites: **Git**, **Node.js 24 with npm**, and **VS Code 1.95 or newer**. 
 
 ### 1. Clone and install dependencies
 
-Copy the repository’s HTTPS URL from GitHub’s **Code** menu and replace `<REPOSITORY_URL>` below. The explicit destination keeps the following commands the same regardless of the repository name.
+Clone the repository and enter the project folder:
 
 ```sh
-git clone "<REPOSITORY_URL>" md_to_pdf
-cd md_to_pdf
+git clone https://github.com/maggie62755/markdown-to-pdf.git
+cd markdown-to-pdf
 npm ci
 npm run prepare:browser
 ```
@@ -71,14 +75,16 @@ npm run package
 
 This command builds the extension, bundles local resources, checks that Chromium starts, and creates a VSIX in the project root. You do not need to run `npm run build` separately; that command alone does not create an installable VSIX.
 
-| Build machine       | Generated file                         |
-| ------------------- | -------------------------------------- |
-| macOS Apple Silicon | `local-markdown-pdf-darwin-arm64.vsix` |
-| macOS Intel         | `local-markdown-pdf-darwin-x64.vsix`   |
-| Windows x64         | `local-markdown-pdf-win32-x64.vsix`    |
-| Ubuntu x64          | `local-markdown-pdf-linux-x64.vsix`    |
+| Build machine       | Generated file                      |
+| ------------------- | ----------------------------------- |
+| macOS Apple Silicon | `markdown-to-pdf-darwin-arm64.vsix` |
+| macOS Intel         | `markdown-to-pdf-darwin-x64.vsix`   |
+| Windows x64         | `markdown-to-pdf-win32-x64.vsix`    |
+| Ubuntu x64          | `markdown-to-pdf-linux-x64.vsix`    |
 
 ### 4. Install in VS Code
+
+If you installed the earlier **Local Markdown PDF** extension, uninstall it before installing **Markdown to PDF**. The package identifier has changed, so VS Code treats it as a separate extension. The existing `localMarkdownPdf` command and setting IDs are retained.
 
 1. Open VS Code and press **Cmd+Shift+P** on macOS or **Ctrl+Shift+P** on Windows/Linux.
 2. Run **Extensions: Install from VSIX…**.
@@ -89,7 +95,7 @@ This command builds the extension, bundles local resources, checks that Chromium
 Alternatively, if the `code` command is available in your terminal, install the file directly. For example, on an Apple Silicon Mac:
 
 ```sh
-code --install-extension ./local-markdown-pdf-darwin-arm64.vsix
+code --install-extension ./markdown-to-pdf-darwin-arm64.vsix
 ```
 
 Use the filename from the table for your platform. If `code` is not found, use the VS Code menu steps above. After changing the source, run `npm run package` again and reinstall the newly generated VSIX.
@@ -97,7 +103,7 @@ Use the filename from the table for your platform. If `code` is not found, use t
 ## Install and use
 
 1. Obtain a VSIX built for your platform, or [build one from source](#build-and-install-from-source). This project is not published on the Marketplace.
-2. In VS Code, run **Extensions: Install from VSIX…** and select `local-markdown-pdf-<platform>.vsix`.
+2. In VS Code, run **Extensions: Install from VSIX…** and select `markdown-to-pdf-<platform>.vsix`.
 3. Open a saved local `.md` file. Unsaved changes are included; untitled files must be saved first so relative images can be resolved.
 4. Right-click inside the editor → **Markdown: Export to PDF**, or use the same command in the Command Palette.
 5. If problems are found, cancel to fix them or choose **Continue with Placeholders**. Available source locations appear in the Problems panel.
