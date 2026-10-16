@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vendor/
+tmp/
+output/
+*.vsix
+package-lock.json
+fixtures/

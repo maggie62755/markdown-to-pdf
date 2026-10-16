@@ -1,0 +1,14 @@
+src/**
+tests/**
+scripts/**
+node_modules/**
+.github/**
+.vscode/**
+tsconfig.json
+package-lock.json
+.vendor/**
+tmp/**
+output/**
+assets/**
+.prettierignore
+.prettierrc.json

@@ -1,0 +1,38 @@
+# Installed dependencies and generated build output
+node_modules/
+/dist/
+*.vsix
+*.tsbuildinfo
+
+# Downloaded Chromium, UI test profiles, and benchmark artifacts
+/.vendor/
+
+# Generated PDFs, screenshots, and temporary render files
+/tmp/
+/output/
+/fixtures/*.pdf
+
+# Test coverage and tool caches
+/coverage/
+/.nyc_output/
+/.cache/
+.eslintcache
+
+# Local environment and logs
+.env
+.env.*
+!.env.example
+*.log
+
+# OS metadata and personal editor settings
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+/.vscode/settings.json
+/.vscode/*.code-snippets
+*.swp
+*.swo
+*~
+
+# Keep shared .vscode/launch.json, docs/images/, fixtures/, and package-lock.json tracked.

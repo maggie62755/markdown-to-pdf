@@ -1,0 +1,38 @@
+name: Package
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel, windows-2022, ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run prepare:browser
+      - name: Install Linux system libraries
+        if: runner.os == 'Linux'
+        run: node node_modules/playwright-core/cli.js install-deps chromium
+      - run: npm run format:check
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+      - run: npm run smoke
+      - run: node scripts/bundle-check.cjs
+      - run: node scripts/preview-check.mjs
+      - run: npm run package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: local-markdown-pdf-${{ matrix.os }}
+          path: |
+            *.vsix
+            output/pdf/*.pdf
+          if-no-files-found: error

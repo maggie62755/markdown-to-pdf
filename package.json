@@ -1,0 +1,103 @@
+{
+  "name": "local-markdown-pdf",
+  "displayName": "Local Markdown PDF",
+  "description": "Export Markdown, math and Mermaid to PDF locally, with a preview before saving.",
+  "version": "0.1.7",
+  "publisher": "local-tools",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "extensionKind": [
+    "ui"
+  ],
+  "main": "./dist/extension.cjs",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false
+    },
+    "virtualWorkspaces": {
+      "supported": false
+    }
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "localMarkdownPdf.export",
+        "title": "Markdown: Export to PDF"
+      },
+      {
+        "command": "localMarkdownPdf.exportAs",
+        "title": "Markdown: Export PDF As\u2026"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "localMarkdownPdf.export",
+          "when": "editorLangId == markdown",
+          "group": "1_modification@20"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Local Markdown PDF",
+      "properties": {
+        "localMarkdownPdf.codeTheme": {
+          "type": "string",
+          "enum": [
+            "one-light",
+            "github-dark"
+          ],
+          "enumItemLabels": [
+            "One Light",
+            "GitHub Dark"
+          ],
+          "enumDescriptions": [
+            "Light code blocks with soft colors (default).",
+            "Dark code blocks on a light document."
+          ],
+          "default": "one-light",
+          "scope": "resource",
+          "description": "Code block theme for PDF output. Applied the next time you generate a preview, independently of the VS Code theme."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "prepare:browser": "node scripts/browser.mjs",
+    "package": "node scripts/package.mjs",
+    "smoke": "node --import tsx scripts/smoke.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/noto-sans-tc": "^5.3.1",
+    "katex": "^0.19.0",
+    "markdown-it": "^15.0.3",
+    "mermaid": "^12.2.0",
+    "pdfjs-dist": "^6.4.299",
+    "playwright-core": "^1.64.1",
+    "sanitize-html": "^2.18.1",
+    "shiki": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/katex": "^0.16.8",
+    "@types/markdown-it": "^14.2.0",
+    "@types/node": "^26.6.5",
+    "@types/sanitize-html": "^2.16.2",
+    "@types/vscode": "^1.95.0",
+    "@vscode/vsce": "^4.0.0",
+    "esbuild": "^0.28.2",
+    "prettier": "3.9.10",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
