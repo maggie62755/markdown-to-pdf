@@ -1,14 +1,12 @@
-<p align="center">
-  <img src="assets/icon.png" alt="Markdown to PDF" width="96" height="96">
-</p>
+![Markdown to PDF](docs/images/logo.png)
 
 # Markdown to PDF
 
 **VS Code 擴充套件：在本機預覽 Markdown，確認後匯出 PDF。**
 
-![VS Code Extension](https://img.shields.io/badge/VS_Code-Extension-007ACC)
-![Local Rendering](https://img.shields.io/badge/Rendering-Local-276749)
-[![MIT License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+![VS Code Extension](docs/images/badges/vscode.png)
+![Local Rendering](docs/images/badges/local.png)
+[![MIT License](docs/images/badges/license.png)](LICENSE)
 
 **[安裝到 VS Code](#從原始碼建置並安裝)** · [English](README.md) · [開發說明](CONTRIBUTING.md) · [驗收清單](ACCEPTANCE.md)
 
@@ -20,7 +18,7 @@
 
 1. 在 Markdown 編輯器內按右鍵 → **Markdown: Export to PDF**。
 2. 在 VS Code 內檢查 PDF 預覽。
-3. 按 **Confirm and Export**，再選擇檔名與資料夾。
+3. 按 **Export**，再選擇檔名與資料夾。
 
 ![Markdown 編輯器的右鍵匯出指令](docs/images/context-menu.png)
 
@@ -32,8 +30,17 @@
 - 程式碼配色可選 **One Light**（預設）或 **GitHub Dark**。
 - 支援表格、本機圖片、KaTeX 公式、Mermaid 流程圖與 GitHub 提示區塊。
 - 內附字型，支援英文、繁體中文與中英混排。
-- A4、頁碼、程式碼長行換行、跨頁表格重複表頭。
+- A4／A5／Letter／Legal、直橫向、字級、邊距、頁碼樣式與行內程式碼顏色可設定。
+- 預覽支援縮放、符合頁寬、跳頁、文字選取與搜尋；來源修改會自動更新；設定按 Save 後才套用。
 - 內附 Chromium，不需另外安裝 Chrome，也不會在第一次匯出時下載元件。
+
+## 預覽操作
+
+工具列依按鈕內容收合置中，PDF 捲動時保持可見。提供頁碼、縮放／符合頁寬、Export、排版設定，以及 **⋯** 內的搜尋與關閉預覽。窄視窗若隱藏前後頁按鈕，仍可直接輸入頁碼。
+
+- 直接修改 Markdown，停止輸入約 500 ms 後重新產生預覽並保留頁碼；更新完成前無法匯出舊版本。
+- 可選取、複製 PDF 文字。在預覽內按 **Cmd+F／Ctrl+F**，或從 **⋯ → Search PDF** 搜尋；**Find next** 會移至下一個符合的頁面。
+- 點「⚠ 數量」查看問題原因並跳到來源區塊；一般狀態資訊收在 **⋯**，不會常駐遮住 PDF。
 
 ## 平台狀態
 
@@ -90,7 +97,7 @@ npm run package
 
 ### 4. 安裝到 VS Code
 
-若先前已安裝 **Local Markdown PDF**，請先解除安裝，再安裝 **Markdown to PDF**。套件識別碼已變更，VS Code 會視為不同擴充套件；既有的 `localMarkdownPdf` 命令與設定 ID 則繼續保留。
+若先前已安裝 **Local Markdown PDF**，請先解除安裝，再安裝 **Markdown to PDF**。套件識別碼已變更，VS Code 會視為不同擴充套件；匯出命令為 `localMarkdownPdf.export`；既有的 `localMarkdownPdf` 設定名稱繼續保留。
 
 1. 開啟 VS Code，macOS 按 **Cmd+Shift+P**，Windows／Linux 按 **Ctrl+Shift+P**。
 2. 執行 **Extensions: Install from VSIX…**。
@@ -112,21 +119,41 @@ code --install-extension ./markdown-to-pdf-darwin-arm64.vsix
 2. 在 VS Code 執行 **Extensions: Install from VSIX…**，選取安裝包。
 3. 開啟本機 `.md` 檔案。未儲存修改會納入匯出；尚未命名的新文件須先儲存，以解析相對圖片路徑。
 4. 編輯器內按右鍵 → **Markdown: Export to PDF**；命令面板也可使用。
-5. 若有內容問題，可取消修正，或選 **Continue with Placeholders**，讓 PDF 保留錯誤提示。來源位置會顯示在 Problems 面板。
-6. 檢查預覽並按 **Confirm and Export**。
+5. 內容問題會在預覽中顯示佔位提示，點工具列的「⚠ 數量」可查看每個問題的原因並跳到來源區塊；Problems 面板也會保留診斷。可直接修改來源，或在匯出時選 **Export with Placeholders**。
+6. 檢查預覽並按 **Export**。
 7. 選擇檔名與資料夾。預設使用來源資料夾與同名 `.pdf`；選到既有檔案時由系統詢問是否取代。
 8. 完成後按 **Open PDF**，以預設程式開啟。
 
-取消預覽或儲存對話框都不會修改既有 PDF。預覽會隨捲動載入頁面。介面為英文，系統對話框語言依作業系統與 VS Code 設定。
+取消預覽或儲存對話框都不會修改既有 PDF。預覽只保留目前頁與前後各一頁的 canvas 與文字層；離開畫面的頁面會釋放，回捲時重新繪製。取消儲存對話框後仍保留預覽。介面為英文，系統對話框語言依作業系統與 VS Code 設定。
 
-## 外觀與語法
+## 排版與配色設定
 
-在設定搜尋 `localMarkdownPdf.codeTheme`，選擇 `one-light` 或 `github-dark`。深色配色只套用於程式碼區塊，文件仍為白底；下次產生預覽時生效。未知程式語言以純文字顯示。
+點預覽工具列 **Export** 旁的調整圖示，開啟 **PDF Settings**。
 
-- 頁邊距：上 **22 mm**、下 **24 mm**、左右各 **18 mm**。
-- 行內程式碼：接近黑色的深藍字＋淺灰底。
-- 程式碼內距：上下 14 px、左右 16 px。
-- 表格儲存格內距：上下 8 px、左右 9 px。
+1. 選擇儲存範圍：**User**、**Workspace**，或可用時的 **Folder**。
+2. 調整欄位。每項都標示預設值；**Reset** 還原單項，**Reset all to defaults** 將表單全部還原為預設值。
+3. 點顏色色塊開啟選色器，下方行內程式碼範例會顯示草稿配色；也可直接輸入六位十六進位色碼。
+4. 按 **Save** 才寫入修改並更新 PDF。**Discard** 恢復已儲存的值；直接關閉設定頁不會儲存草稿。
+
+欄位顯示來源文件目前生效的設定，Workspace／Folder 設定可能優先於 User。**VS Code settings** 按鈕會開啟原生設定頁；在原生頁修改時，依 VS Code 的一般行為立即套用。
+
+| 設定後綴                                                    | 可用值／範圍                                                         | 預設              |
+| ----------------------------------------------------------- | -------------------------------------------------------------------- | ----------------- |
+| `codeTheme`                                                 | one-light、github-dark                                               | one-light         |
+| `paperSize`                                                 | A4、A5、Letter、Legal                                                | A4                |
+| `orientation`                                               | portrait、landscape                                                  | portrait          |
+| `fontSize`                                                  | 8–24 pt（本文）                                                      | 11                |
+| `marginTop` / `marginBottom` / `marginLeft` / `marginRight` | 各 5–40 mm                                                           | 22 / 24 / 18 / 18 |
+| `pageNumbers`                                               | true / false                                                         | true              |
+| `pageNumberStyle`                                           | current-total（1 / 10）、current（1）、page-of-total（Page 1 of 10） | current-total     |
+| `inlineCodeBackground`                                      | 六位十六進位顏色                                                     | #f1f3f5           |
+| `inlineCodeColor`                                           | 六位十六進位顏色                                                     | #172b4d           |
+
+完整名稱例如 `localMarkdownPdf.paperSize`。行內程式碼顏色適用於單反引號的 `code`；多行程式碼區塊使用 `codeTheme`。搜尋的 **Find next** 會移至下一個含有關鍵字的頁面，並標記該頁相符文字。
+
+只保留 **Markdown: Export to PDF** 指令；舊的 `localMarkdownPdf.exportAs` 已移除，自訂快捷鍵請改用 `localMarkdownPdf.export`。
+
+## 支援的內容
 
 支援一般 Markdown 語法；公式使用 `$…$`／`$$…$$`，流程圖使用 `mermaid` 程式碼區塊。
 
@@ -147,13 +174,13 @@ code --install-extension ./markdown-to-pdf-darwin-arm64.vsix
 VSIX 包含 Chromium、PDF.js、Shiki、KaTeX、Mermaid、樣式與字型。渲染器阻擋外部請求與文件任意腳本；內嵌 HTML 僅接受少量無屬性的文字標籤。
 
 - 圖片支援 PNG、JPEG、GIF、WebP，以 Markdown 所在目錄解析相對路徑。遠端圖片須自行下載並修改引用；SVG 圖檔須先轉成 PNG，Mermaid 產生的 SVG 則可使用。
-- 圖片缺失、公式或流程圖錯誤，僅在選擇繼續時留下可辨識提示。部分來源位置只能定位到區塊起始行。
+- 圖片缺失、公式或流程圖錯誤會在預覽中留下可辨識提示，匯出時須明確確認保留佔位提示。部分來源位置只能定位到區塊起始行。
 - 超大型流程圖、過寬公式、過高表格列、罕見字與 emoji 仍需檢查。
 - PDF 閱讀器複製已換行的 Bash 指令時，可能加入換行字元，執行前請確認。
-- 修改來源後須重新產生預覽；首次啟動 Chromium 可能需要數秒。
+- 停止輸入約 500 ms 後開始更新預覽，轉檔仍需要時間；更新期間無法匯出舊版本，更新後保留閱讀頁碼。首次啟動 Chromium 可能需要數秒。
 
 ## 開發與授權
 
-安裝依賴、格式化、測試、截圖重拍及各平台打包方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。GitHub Actions 的 **Package** 工作流程會上傳 VSIX 與範例 PDF，並不會自動發佈 Release 或 Marketplace。
+安裝依賴、格式化、測試、截圖重拍及各平台打包方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。GitHub Actions 的 **Check** 會在 PR 與推送至 `main` 時執行基本與整合檢查；手動 **Package** 工作流程會上傳 VSIX 與範例 PDF，並不會自動發佈 Release 或 Marketplace。
 
 採用 [MIT 授權](LICENSE)；字型保留 OFL 授權，建置產物包含第三方授權聲明。

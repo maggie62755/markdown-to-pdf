@@ -1,3 +1,10 @@
+import {
+  defaultLayout,
+  layoutCss,
+  footer,
+  contentSize,
+  type Layout,
+} from './layout';
 import type { CodeTheme } from './themes';
 import path from 'node:path';
 import { readFile, writeFile, rename, unlink } from 'node:fs/promises';
@@ -6,6 +13,7 @@ import { createRequire } from 'node:module';
 import { renderMarkdown, type Issue } from './markdown';
 export interface ExportOptions {
   source: string;
+  layout?: Layout;
   codeTheme?: CodeTheme;
   filename: string;
   output: string | (() => Promise<string | undefined>);
@@ -18,15 +26,20 @@ export interface ExportOptions {
 }
 export async function exportPdf(options: ExportOptions) {
   const { source, filename, root, signal } = options;
-  signal?.throwIfAborted();
+  checkCancelled(signal);
+  const layout = options.layout ?? defaultLayout;
   options.progress?.('Parsing Markdown and highlighting code');
-  const rendered = await renderMarkdown(source, filename, options.codeTheme);
+  const rendered = await abortable(
+    renderMarkdown(source, filename, options.codeTheme, signal),
+    signal,
+  );
+  checkCancelled(signal);
   options.progress?.('Starting local Chromium');
   process.env.PLAYWRIGHT_BROWSERS_PATH = path.join(root, 'dist/browsers');
   const require = createRequire(path.join(root, 'dist/extension.cjs'));
   const { chromium } =
     require('./playwright/index.js') as typeof import('playwright-core');
-  const browser = await chromium
+  const launch = chromium
     .launch({ headless: true, timeout: 30000 })
     .catch((error: Error) => {
       const hint =
@@ -37,6 +50,10 @@ export async function exportPdf(options: ExportOptions) {
         `Bundled Chromium could not start. Install the VSIX matching your OS and architecture.${hint} ${error.message}`,
       );
     });
+  // A cancelled launch is closed as soon as it completes, even if the caller has returned.
+  const browser = await abortable(launch, signal, (browser) => {
+    void browser.close();
+  });
   options.progress?.('Loading local fonts and document');
   let expired = false;
   const cancel = () => {
@@ -47,10 +64,13 @@ export async function exportPdf(options: ExportOptions) {
     expired = true;
     cancel();
   }, options.timeout ?? 120000);
-  let temp: string | undefined;
   try {
-    signal?.throwIfAborted();
+    checkCancelled(signal);
     const context = await browser.newContext({
+      viewport: {
+        width: Math.ceil((contentSize(layout).width * 96) / 25.4),
+        height: Math.ceil((contentSize(layout).height * 96) / 25.4),
+      },
       offline: true,
       serviceWorkers: 'block',
     });
@@ -61,7 +81,7 @@ export async function exportPdf(options: ExportOptions) {
       if (url.pathname === '/document')
         return route.fulfill({
           contentType: 'text/html',
-          body: `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"><link rel="stylesheet" href="/assets/print.css"></head><body data-code-theme="${rendered.codeTheme}">${rendered.html}</body></html>`,
+          body: `<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"><link rel="stylesheet" href="/assets/print.css"><style>${layoutCss(layout)}</style></head><body data-code-theme="${rendered.codeTheme}">${rendered.html}</body></html>`,
         });
       const resource = rendered.resources.get(url.pathname);
       if (resource)
@@ -95,6 +115,7 @@ export async function exportPdf(options: ExportOptions) {
       }
     });
     const page = await context.newPage();
+    await page.emulateMedia({ media: 'print' });
     await page.goto(`${origin}/document`);
     options.progress?.('Rendering math, images and Mermaid diagrams');
     const runtimeIssues: Issue[] = await page.evaluate(async () => {
@@ -104,52 +125,101 @@ export async function exportPdf(options: ExportOptions) {
     const issues = [...rendered.issues, ...runtimeIssues];
     clearTimeout(timer); // User decision time does not consume rendering timeout.
     if (issues.length && !(await options.onIssues(issues)))
-      throw new Error('Export cancelled. Fix the document and try again.');
-    signal?.throwIfAborted();
+      throw new ExportCancelled();
+    checkCancelled(signal);
     options.progress?.('Generating PDF');
-    const printTimer = setTimeout(cancel, 30000);
+    const printTimer = setTimeout(() => {
+      expired = true;
+      cancel();
+    }, 30000);
     let pdf: Buffer;
     try {
       pdf = await page.pdf({
-        format: 'A4',
+        format: layout.paperSize,
+        landscape: layout.orientation === 'landscape',
         printBackground: true,
-        margin: { top: '22mm', bottom: '24mm', left: '18mm', right: '18mm' },
-        displayHeaderFooter: true,
+        margin: {
+          top: `${layout.marginTop}mm`,
+          bottom: `${layout.marginBottom}mm`,
+          left: `${layout.marginLeft}mm`,
+          right: `${layout.marginRight}mm`,
+        },
+        displayHeaderFooter: layout.pageNumbers,
         headerTemplate: '<span></span>',
-        footerTemplate:
-          '<div style="width:100%;text-align:center;font-size:9px;color:#666"><span class="pageNumber"></span> / <span class="totalPages"></span></div>',
+        footerTemplate: footer(layout),
       });
     } finally {
       clearTimeout(printTimer);
     }
-    signal?.throwIfAborted();
+    checkCancelled(signal);
     await browser.close();
     if (options.onPreview && !(await options.onPreview(pdf)))
-      throw new Error('Export cancelled');
-    signal?.throwIfAborted();
+      throw new ExportCancelled();
+    checkCancelled(signal);
     const output =
       typeof options.output === 'function'
         ? await options.output()
         : options.output;
-    signal?.throwIfAborted();
+    checkCancelled(signal);
     if (!output) return { issues, output: undefined };
-    temp = path.join(
-      path.dirname(output),
-      `.${path.basename(output)}.${randomUUID()}.tmp`,
-    );
-    await writeFile(temp, pdf, { flag: 'wx' });
-    signal?.throwIfAborted();
-    // Same-directory rename: a failed render never truncates an existing PDF.
-    await rename(temp, output);
+    await savePdf(pdf, output, signal);
     return { issues, output };
   } catch (e) {
-    if (signal?.aborted) throw new Error('Export cancelled');
+    if (signal?.aborted) throw new ExportCancelled();
     if (expired) throw new Error('PDF rendering timed out');
     throw e;
   } finally {
     clearTimeout(timer);
     signal?.removeEventListener('abort', cancel);
     await browser.close();
-    if (temp) await unlink(temp).catch(() => {});
+  }
+}
+
+export class ExportCancelled extends Error {
+  constructor() {
+    super('Export cancelled');
+    this.name = 'ExportCancelled';
+  }
+}
+export function checkCancelled(signal?: AbortSignal) {
+  if (signal?.aborted) throw new ExportCancelled();
+}
+export function abortable<T>(
+  promise: Promise<T>,
+  signal?: AbortSignal,
+  late?: (value: T) => void,
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    let cancelled = false;
+    const abort = () => {
+      cancelled = true;
+      reject(new ExportCancelled());
+    };
+    signal?.addEventListener('abort', abort, { once: true });
+    if (signal?.aborted) abort();
+    promise
+      .then((value) => {
+        if (cancelled) late?.(value);
+        else resolve(value);
+      }, reject)
+      .finally(() => signal?.removeEventListener('abort', abort));
+  });
+}
+export async function savePdf(
+  pdf: Buffer,
+  output: string,
+  signal?: AbortSignal,
+) {
+  checkCancelled(signal);
+  const temp = path.join(
+    path.dirname(output),
+    `.${path.basename(output)}.${randomUUID()}.tmp`,
+  );
+  try {
+    await writeFile(temp, pdf, { flag: 'wx' });
+    checkCancelled(signal);
+    await rename(temp, output);
+  } finally {
+    await unlink(temp).catch(() => {});
   }
 }

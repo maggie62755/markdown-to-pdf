@@ -1,6 +1,8 @@
 # Icon concept
 
-Generated with the built-in image generation tool. Draft asset: `assets/icon-concept.png`.
+The original concept was generated with the built-in image generation tool. The shipped extension icon is `assets/icon.png`; the original draft file is not part of the repository.
+
+Both READMEs use `docs/images/logo.png`, a 96 px PNG derived from the shipped icon, with standard Markdown image syntax so the offline renderer can display it. Regenerate this asset and the static badges with `node scripts/readme-assets.mjs` after building. The badges are rendered from text and CSS; they do not request remote badge services.
 
 ## Prompt
 

@@ -4,7 +4,7 @@ import MarkdownIt from 'markdown-it';
 import katex from 'katex';
 import sanitizeHtml from 'sanitize-html';
 import { codeToHtml } from 'shiki';
-import { readFile } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 export interface Issue {
@@ -33,7 +33,9 @@ export async function renderMarkdown(
   source: string,
   filename: string,
   selectedTheme?: CodeTheme,
+  signal?: AbortSignal,
 ): Promise<Rendered> {
+  signal?.throwIfAborted();
   const codeTheme = resolveCodeTheme(selectedTheme);
   const issues: Issue[] = [];
   const resources: Rendered['resources'] = new Map();
@@ -120,6 +122,7 @@ export async function renderMarkdown(
   async function walk(list: typeof tokens, inherited?: number) {
     for (const token of list) {
       const line = token.map ? token.map[0] + 1 : inherited;
+      signal?.throwIfAborted();
       if (token.type === 'inline' && token.children) {
         // markdown-it inline children lack source maps; use the containing block's start.
         await walk(token.children, line);
@@ -192,7 +195,9 @@ export async function renderMarkdown(
             throw new Error(
               'Supported image formats: PNG, JPEG, GIF and WebP. Convert SVG images to PNG.',
             );
-          const body = await readFile(local);
+          if ((await stat(local)).size > 30 * 1024 * 1024)
+            throw new Error('Image exceeds the 30 MB limit');
+          const body = await readFile(local, { signal });
           if (body.length > 30 * 1024 * 1024)
             throw new Error('Image exceeds the 30 MB limit');
           const url = `/images/${imageId++}`;

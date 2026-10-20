@@ -76,3 +76,9 @@ for (const name of packages.filter((n) => !n.startsWith('.'))) {
     }
 }
 await writeFile('dist/THIRD-PARTY-NOTICES.txt', licenses);
+
+await cp('assets/viewer.mjs', 'dist/assets/pdfjs/viewer.mjs');
+await cp(
+  'node_modules/pdfjs-dist/web/pdf_viewer.css',
+  'dist/assets/pdfjs/pdf_viewer.css',
+);

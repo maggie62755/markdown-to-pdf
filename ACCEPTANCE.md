@@ -1,18 +1,26 @@
 # 跨平台驗收
 
-需求更新：加入 Windows 11 x64 與 Ubuntu 22.04/24.04 x64 桌面版。使用者必須先預覽實際 PDF，確認後才寫入目的地。
+目前版本：**0.2.4**。使用者必須先預覽實際 PDF，按 Export 後才選擇目的地並寫檔。PDF Settings 中的修改、選色與 Reset 都是草稿，按 Save 才套用；Discard 或關閉設定頁不會寫入草稿。
 
-## 自動驗證
+## 已完成的本機驗證（macOS Apple Silicon）
 
-- `npm run check`：TypeScript 型別檢查。
-- `npm test`：圖片錯誤、HTML 過濾、公式錯誤、未知語言、Bash 與 Mermaid 來源位置。
-- `npm run smoke`：內附 Chromium、完全離線 context、完整內容與錯誤佔位 PDF。
+- [x] `npm run check`：TypeScript 型別檢查。
+- [x] `npm test`：Markdown、提示區塊、設定驗證、取消與原子寫檔，共 11 項測試。
+- [x] `npm run smoke`：離線 Chromium、完整內容、錯誤佔位、排版範例與取消時保留原 PDF。
+- [x] `node scripts/bundle-check.cjs`：確認後才儲存、取消、來源／設定更新、阻止過期預覽匯出，以及問題清單跳到來源。
+- [x] `node scripts/preview-check.mjs`：縮放、跳頁、文字層、搜尋、最多三頁 canvas、即時替換、工具列窄視窗與水平捲動，以及 PDF 紙張／字級／邊距／頁碼。
+- [x] `TEST_PREVIEW_FAIL=module` 與 `TEST_PREVIEW_FAIL=worker`：載入失敗會停用匯出，並能關閉預覽。
+- [x] `node scripts/vscode-preview-check.mjs`：真實 VS Code 預覽與設定入口、12 項預設值、選色器及配色範例；修改與 Reset 不會提前寫入，Save 才套用，Discard 恢復已儲存值。
+- [x] `node --import tsx scripts/readme-check.ts`：中英文 README 完全離線轉 PDF，無圖片或內容錯誤。
+- [x] VSIX 包含 README 圖片，主要 README 圖片連結已轉為 GitHub `main` 的 HTTPS 網址。
+
+使用者已確認 0.2.4 新版測試可用。以上是本機驗證紀錄，不代表下列所有平台與人工情境都已通過；GitHub 工作流程仍須在推送後確認執行結果。
 
 ## 人工驗收清單
 
 - [ ] Windows 11 x64：原生建置、VSIX 安裝、離線完整內容、預覽與儲存／覆蓋對話框。
 - [ ] Ubuntu 22.04/24.04 x64：系統函式庫檢查、原生建置、VSIX 安裝、離線完整內容、預覽與儲存／覆蓋對話框。
-- [ ] 各平台上 22 mm／下 24 mm／左右 18 mm；逐頁檢查分頁、表格與長程式碼。
+- [ ] 各平台預設上 22 mm／下 24 mm／左右 18 mm；逐頁檢查分頁、表格與長程式碼。
 
 - [ ] Apple Silicon：實際 VSIX 安裝、Markdown 編輯器右鍵選單及命令面板。
 - [ ] Intel：在 Intel Mac 建置 VSIX 並安裝測試。
@@ -30,8 +38,26 @@
 
 尚未勾選代表尚未實際完成，不代表已通過。
 
-## v0.1.5 預覽延遲修正驗證
+## 歷史紀錄：v0.1.5 預覽延遲修正驗證
 
 在獨立設定檔的 VS Code 1.141.0 Extension Development Host 實測：原版本 PDF worker 在 Webview 載入約 30 秒後失敗並回退，指令到頁面約 34–36 秒。改用文件端 fetch 加 Blob worker 後，重複測試指令到頁面約 3.5 秒，Webview 開啟到可見頁面不超過約 1.2 秒（每秒輪詢）。首次 Chromium 啟動仍可能增加數秒。
 
 已驗證 PDF.js 主模組／worker 載入失敗會顯示錯誤且可取消；首屏及捲動載入、確認與取消皆通過。這些測試不取代所有機型與文件的效能驗收。
+
+## 跨平台人工複驗：即時預覽與排版設定
+
+- [ ] 停止輸入後自動更新，保留頁碼；連續修改不會顯示舊結果。
+- [ ] 更新中無法匯出；儲存對話框開啟期間修改文件，必須重新檢查預覽。
+- [ ] 縮放、符合頁寬、前後頁、指定頁碼、文字選取與搜尋可用。
+- [ ] 捲動長文件後最多保留三頁 canvas；回捲會重新繪製。
+- [ ] 修改紙張、方向、本文字級、四邊邊距、頁碼格式與開關後，按 Save 才更新預覽。
+- [ ] 行內程式碼文字／底色改變，多行程式碼配色不受影響。
+- [ ] 取消內容問題提示與儲存對話框會保留預覽，不顯示匯出失敗。
+- [ ] 命令面板只顯示一個匯出指令。
+
+- [ ] 每項設定有預設值；Reset／Reset all 僅改草稿，Save 才寫入。
+- [ ] 選色器可顯示與修改底色、文字色；樣本即時更新，PDF 等待 Save。
+- [ ] Discard 恢復已儲存值；關閉設定頁不會套用草稿。
+- [ ] User／Workspace／Folder 範圍與優先順序符合預期。
+- [ ] 工具列依內容收合；窄視窗與水平捲動時保持可操作。
+- [ ] 警告數量可開啟問題清單並跳到來源區塊，狀態訊息不遮住 PDF。

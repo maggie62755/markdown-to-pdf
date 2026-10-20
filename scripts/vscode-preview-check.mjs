@@ -1,5 +1,5 @@
 import { _electron as electron } from 'playwright-core';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 const screenshots = process.env.CAPTURE_SCREENSHOTS === '1';
 if (screenshots) await mkdir('docs/images', { recursive: true });
@@ -101,15 +101,20 @@ try {
     const state = await Promise.all(
       page.frames().map(async (frame) => ({
         url: frame.url(),
-        text: await frame
-          .locator('body')
-          .innerText({ timeout: 1000 })
-          .catch(() => ''),
+        text:
+          (await frame
+            .locator('body')
+            .innerText({ timeout: 1000 })
+            .catch(() => '')) +
+          (await frame
+            .locator('#status')
+            .textContent({ timeout: 100 })
+            .catch(() => '')),
       })),
     );
     const preview = state.find(
       (s) =>
-        s.text.includes('PDF Preview') &&
+        s.text.includes('Fit width') &&
         (s.text.includes('Loading pages') ||
           s.text.includes(' rendered') ||
           s.text.includes('Preview failed')),
@@ -160,14 +165,98 @@ try {
   if (screenshots) {
     const frame = page.frames().find((f) => f.url().includes('/fake.html'));
     const second = frame.locator('main section').nth(1);
-    await second.evaluate((el) =>
-      window.scrollTo(
-        0,
-        el.offsetTop - document.querySelector('header').offsetHeight - 12,
-      ),
-    );
+    await second.evaluate((el) => el.scrollIntoView({ block: 'start' }));
     await page.waitForTimeout(1000);
     await page.screenshot({ path: 'docs/images/pdf-features.png' });
+  }
+  if (!screenshots) {
+    const previewFrame = page
+      .frames()
+      .find((f) => f.url().includes('/fake.html'));
+    await previewFrame.locator('#settings').click();
+    let settingsFrame;
+    for (let attempt = 0; attempt < 30; attempt++) {
+      settingsFrame = page
+        .frames()
+        .find(
+          (frame) =>
+            frame !== previewFrame && frame.url().includes('/fake.html'),
+        );
+      if (
+        settingsFrame &&
+        (await settingsFrame.locator('#inlineCodeColor').count())
+      )
+        break;
+      await page.waitForTimeout(200);
+    }
+    if (!settingsFrame) throw new Error('PDF Settings panel did not open');
+    await settingsFrame.locator('#inlineCodeColor').waitFor();
+    if ((await settingsFrame.locator('.default').count()) !== 12)
+      throw new Error('Missing default labels');
+    if ((await settingsFrame.locator('input[type=color]').count()) !== 2)
+      throw new Error('Missing color pickers');
+    await settingsFrame.locator('#inlineCodeColor').fill('#cc2244');
+    await settingsFrame.locator('#inlineCodeColor').press('Tab');
+    await settingsFrame.waitForFunction(
+      () =>
+        document.getElementById('sample').style.color === 'rgb(204, 34, 68)',
+    );
+    const readSettings = async () =>
+      JSON.parse(
+        await readFile(path.join(profile, 'User/settings.json'), 'utf8'),
+      );
+    await page.waitForTimeout(700);
+    if (
+      (await readSettings())['localMarkdownPdf.inlineCodeColor'] !== undefined
+    )
+      throw new Error('Editing applied before Save');
+    await settingsFrame.locator('#save').click();
+    await settingsFrame.waitForFunction(() =>
+      document.getElementById('notice').textContent.startsWith('Saved.'),
+    );
+    if (
+      (await readSettings())['localMarkdownPdf.inlineCodeColor'] !== '#cc2244'
+    )
+      throw new Error('Save did not apply color');
+    await settingsFrame.locator('[data-reset="inlineCodeColor"]').click();
+    await settingsFrame.waitForFunction(
+      () => document.getElementById('inlineCodeColor').value === '#172b4d',
+    );
+    if (
+      (await readSettings())['localMarkdownPdf.inlineCodeColor'] !== '#cc2244'
+    )
+      throw new Error('Reset applied before Save');
+    await settingsFrame.locator('#discard').click();
+    await settingsFrame.waitForFunction(
+      () => document.getElementById('inlineCodeColor').value === '#cc2244',
+    );
+    await settingsFrame.locator('#fontSize').fill('18');
+    await settingsFrame.locator('#fontSize').press('Tab');
+    await settingsFrame.locator('#reset-all').click();
+    await settingsFrame.waitForFunction(
+      () => document.getElementById('fontSize').value === '11',
+    );
+    if (
+      (await readSettings())['localMarkdownPdf.inlineCodeColor'] !== '#cc2244'
+    )
+      throw new Error('Reset-all applied before Save');
+    await settingsFrame.locator('#save').click();
+    await settingsFrame.waitForFunction(() =>
+      document.getElementById('notice').textContent.startsWith('Saved.'),
+    );
+    if (
+      (await readSettings())['localMarkdownPdf.inlineCodeColor'] !== '#172b4d'
+    )
+      throw new Error('Save did not apply reset');
+    console.log(
+      'Draft edits and resets do not write settings; Save applies and Discard restores saved values',
+    );
+    await page.screenshot({ path: '.vendor/settings-check.png' });
+    await settingsFrame.locator('#native').click();
+    await page
+      .locator('.settings-count-widget')
+      .filter({ hasText: '12 Settings Found' })
+      .waitFor({ timeout: 15000 });
   }
   const logs = await app.evaluate(() => process.versions);
   console.log('Electron versions', logs);

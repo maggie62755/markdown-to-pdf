@@ -44,7 +44,7 @@ flowchart LR
 | :--- | :--- |
 | Code themes | One Light or GitHub Dark |
 | Typography | Bundled English and Traditional Chinese fonts |
-| Page layout | A4 margins, page numbers, and wrapped code |
+| Page layout | A4 by default; configurable paper, margins, and page numbers |
 | Export | Review first, then choose a filename and folder |
 
 ## Math, without screenshots
@@ -58,8 +58,8 @@ $$
 Equations remain crisp alongside selectable document text.
 
 > [!TIP]
-> Switch `localMarkdownPdf.codeTheme` to `github-dark`
-> for dark code blocks while keeping the page white.
+> Open PDF Settings, choose GitHub Dark for code blocks,
+> then press **Save** to apply. The document stays white.
 
 > [!IMPORTANT]
 > Confirm the preview before saving. Cancelling leaves your

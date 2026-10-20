@@ -2,7 +2,7 @@
   "name": "markdown-to-pdf",
   "displayName": "Markdown to PDF",
   "description": "Preview and export Markdown to PDF locally in VS Code.",
-  "version": "0.1.11",
+  "version": "0.2.4",
   "publisher": "local-tools",
   "license": "MIT",
   "engines": {
@@ -28,10 +28,6 @@
       {
         "command": "localMarkdownPdf.export",
         "title": "Markdown: Export to PDF"
-      },
-      {
-        "command": "localMarkdownPdf.exportAs",
-        "title": "Markdown: Export PDF As…"
       }
     ],
     "menus": {
@@ -62,7 +58,107 @@
           ],
           "default": "one-light",
           "scope": "resource",
-          "description": "Code block theme for PDF output. Applied the next time you generate a preview, independently of the VS Code theme."
+          "description": "Code block theme for PDF output, independently of the VS Code theme. Updates the open preview automatically. Default: one-light. Use Reset Setting to restore."
+        },
+        "localMarkdownPdf.paperSize": {
+          "type": "string",
+          "enum": [
+            "A4",
+            "A5",
+            "Letter",
+            "Legal"
+          ],
+          "default": "A4",
+          "description": "PDF paper size. Default: A4. Use Reset Setting to restore.",
+          "scope": "resource"
+        },
+        "localMarkdownPdf.orientation": {
+          "type": "string",
+          "enum": [
+            "portrait",
+            "landscape"
+          ],
+          "default": "portrait",
+          "description": "PDF page orientation. Default: portrait. Use Reset Setting to restore.",
+          "scope": "resource"
+        },
+        "localMarkdownPdf.fontSize": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 24,
+          "default": 11,
+          "description": "Document body font size in points. Default: 11 pt. Use Reset Setting to restore.",
+          "scope": "resource"
+        },
+        "localMarkdownPdf.pageNumbers": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show page numbers in the footer. Default: true. Use Reset Setting to restore.",
+          "scope": "resource"
+        },
+        "localMarkdownPdf.pageNumberStyle": {
+          "type": "string",
+          "enum": [
+            "current-total",
+            "current",
+            "page-of-total"
+          ],
+          "enumDescriptions": [
+            "1 / 10",
+            "1",
+            "Page 1 of 10"
+          ],
+          "default": "current-total",
+          "description": "Page number format. Default: current-total. Use Reset Setting to restore.",
+          "scope": "resource"
+        },
+        "localMarkdownPdf.inlineCodeBackground": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "default": "#f1f3f5",
+          "description": "Inline code background, as a six-digit hex color. Default: #f1f3f5. Use Reset Setting to restore.",
+          "scope": "resource",
+          "format": "color-hex"
+        },
+        "localMarkdownPdf.inlineCodeColor": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "default": "#172b4d",
+          "description": "Inline code text, as a six-digit hex color. Default: #172b4d. Use Reset Setting to restore.",
+          "scope": "resource",
+          "format": "color-hex"
+        },
+        "localMarkdownPdf.marginTop": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 40,
+          "default": 22,
+          "description": "Top page margin in millimeters. Default: 22 mm. Use Reset Setting to restore.",
+          "scope": "resource"
+        },
+        "localMarkdownPdf.marginBottom": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 40,
+          "default": 24,
+          "description": "Bottom page margin in millimeters. Default: 24 mm. Use Reset Setting to restore.",
+          "scope": "resource"
+        },
+        "localMarkdownPdf.marginLeft": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 40,
+          "default": 18,
+          "description": "Left page margin in millimeters. Default: 18 mm. Use Reset Setting to restore.",
+          "scope": "resource"
+        },
+        "localMarkdownPdf.marginRight": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 40,
+          "default": 18,
+          "description": "Right page margin in millimeters. Default: 18 mm. Use Reset Setting to restore.",
+          "scope": "resource"
         }
       }
     }

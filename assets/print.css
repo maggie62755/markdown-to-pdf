@@ -1,9 +1,6 @@
 @import url('/assets/noto-sans-tc/font.css');
 @import url('/assets/jetbrains-mono/font.css');
 @import url('/assets/katex/katex.min.css');
-@page {
-  size: A4;
-}
 * {
   box-sizing: border-box;
 }

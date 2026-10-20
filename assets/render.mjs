@@ -46,7 +46,8 @@ export async function render() {
   }
   await document.fonts.ready;
   for (const pre of document.querySelectorAll('pre'))
-    if (pre.getBoundingClientRect().height < 850) pre.classList.add('short');
+    if (pre.getBoundingClientRect().height < window.innerHeight * 0.9)
+      pre.classList.add('short');
   for (const el of document.querySelectorAll('.katex-display')) {
     if (el.scrollWidth > el.clientWidth)
       el.style.fontSize = `${Math.max(0.3, el.clientWidth / el.scrollWidth)}em`;

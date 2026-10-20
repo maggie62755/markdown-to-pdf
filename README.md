@@ -1,14 +1,12 @@
-<p align="center">
-  <img src="assets/icon.png" alt="Markdown to PDF" width="96" height="96">
-</p>
+![Markdown to PDF](docs/images/logo.png)
 
 # Markdown to PDF
 
 **A VS Code extension to preview and export Markdown as PDF — entirely on your computer.**
 
-![VS Code Extension](https://img.shields.io/badge/VS_Code-Extension-007ACC)
-![Local Rendering](https://img.shields.io/badge/Rendering-Local-276749)
-[![MIT License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+![VS Code Extension](docs/images/badges/vscode.png)
+![Local Rendering](docs/images/badges/local.png)
+[![MIT License](docs/images/badges/license.png)](LICENSE)
 
 **[Install in VS Code](#build-and-install-from-source)** · [繁體中文](README.zh-TW.md) · [Development guide](CONTRIBUTING.md) · [Acceptance checklist](ACCEPTANCE.md)
 
@@ -20,7 +18,7 @@ Syntax-highlighted code, math, Mermaid diagrams, and English / Traditional Chine
 
 1. Right-click inside a Markdown editor → **Markdown: Export to PDF**.
 2. Review the PDF preview inside VS Code.
-3. Click **Confirm and Export**, then choose the filename and folder.
+3. Click **Export**, then choose the filename and folder.
 
 ![Markdown editor context menu with the Export to PDF command](docs/images/context-menu.png)
 
@@ -32,8 +30,17 @@ Screenshots use VS Code’s **Quiet Light** theme with Chat hidden. The PDF uses
 - Syntax highlighting with **One Light** (default) or **GitHub Dark** code blocks.
 - Tables, local images, KaTeX math, Mermaid diagrams, and GitHub-style alerts.
 - English and Traditional Chinese with bundled fonts.
-- A4 pages with page numbers, wrapped code, and repeating table headers.
+- Configurable A4/A5/Letter/Legal paper, orientation, body font size, margins, page numbers, and inline code colors.
+- Zoom, fit width, page navigation, selectable text, search, and automatic preview updates.
 - Local rendering with bundled Chromium; no installed Chrome, cloud conversion, or first-export downloads.
+
+## Preview controls
+
+The compact toolbar fits its controls and stays visible while the PDF scrolls. It includes page navigation, zoom / fit width, Export, layout settings, and **⋯** for search and closing the preview. On narrow panels, use the page number field when the previous/next buttons are hidden.
+
+- Edit Markdown directly: after a 500 ms typing pause, the preview regenerates and preserves your page number. Export stays disabled until the latest version is ready.
+- Select and copy text in the PDF. Open **⋯ → Search PDF**, or press **Cmd+F / Ctrl+F** while focused in the preview. **Find next** moves to the next matching page.
+- Click the warning count to inspect issues and reveal their source. Status details stay inside **⋯**, without covering the PDF.
 
 ## Platforms
 
@@ -90,7 +97,7 @@ This command builds the extension, bundles local resources, checks that Chromium
 
 ### 4. Install in VS Code
 
-If you installed the earlier **Local Markdown PDF** extension, uninstall it before installing **Markdown to PDF**. The package identifier has changed, so VS Code treats it as a separate extension. The existing `localMarkdownPdf` command and setting IDs are retained.
+If you installed the earlier **Local Markdown PDF** extension, uninstall it before installing **Markdown to PDF**. The package identifier has changed, so VS Code treats it as a separate extension. The export command is `localMarkdownPdf.export`; existing `localMarkdownPdf` setting keys are retained.
 
 1. Open VS Code and press **Cmd+Shift+P** on macOS or **Ctrl+Shift+P** on Windows/Linux.
 2. Run **Extensions: Install from VSIX…**.
@@ -112,29 +119,39 @@ Use the filename from the table for your platform. If `code` is not found, use t
 2. In VS Code, run **Extensions: Install from VSIX…** and select `markdown-to-pdf-<platform>.vsix`.
 3. Open a saved local `.md` file. Unsaved changes are included; untitled files must be saved first so relative images can be resolved.
 4. Right-click inside the editor → **Markdown: Export to PDF**, or use the same command in the Command Palette.
-5. If problems are found, cancel to fix them or choose **Continue with Placeholders**. Available source locations appear in the Problems panel.
-6. Review the PDF preview and click **Confirm and Export**.
+5. If the toolbar shows **⚠** with a count, click it to read each issue and jump to its Markdown source block. Fix the source, or explicitly choose **Export with Placeholders** when exporting. Problems also lists the diagnostics.
+6. Review the PDF preview and click **Export**.
 7. Choose the filename and folder. The source folder and basename are prefilled; the system asks before replacing an existing file.
 8. Choose **Open PDF** after export to open your default PDF viewer.
 
-Cancelling either the preview or save dialog leaves existing files untouched. The exported file contains the exact PDF bytes shown in the preview. Pages load as you scroll.
+Cancelling either the preview or save dialog leaves existing files untouched. The exported file contains the exact PDF bytes shown in the preview. Only the current page and its immediate neighbors retain canvases and text layers. Scrolling back redraws released pages. Cancelling the save dialog keeps the preview open.
 
-## Appearance
+## Layout and live preview settings
 
-Set `localMarkdownPdf.codeTheme` in VS Code Settings:
+Click the adjustment icon beside **Export** to open **PDF Settings**.
 
-```json
-{
-  "localMarkdownPdf.codeTheme": "one-light"
-}
-```
+1. Choose where to save: **User**, **Workspace**, or **Folder** (when available).
+2. Adjust the fields. Each shows its default value; **Reset** restores one field and **Reset all to defaults** restores all fields in the draft.
+3. Click a color swatch to open the color picker. The inline code sample shows the draft background and text colors; you can also enter a six-digit hex color.
+4. Click **Save** to apply the edited fields and refresh the PDF. **Discard** restores saved values. Closing the settings tab does not save the draft.
 
-Choose `github-dark` for dark code blocks. The document itself stays white. Changes apply when generating the next preview; unknown code languages use plain text in the selected theme.
+Settings display the effective values for the source document. Workspace and folder values can override user settings. The **VS Code settings** button opens the native editor, where changes apply immediately using VS Code's normal behavior.
 
-- Page margins: **22 mm top, 24 mm bottom, 18 mm left and right**.
-- Inline code: near-black navy on light gray.
-- Code block padding: 14 px vertically, 16 px horizontally.
-- Table cell padding: 8 px vertically, 9 px horizontally.
+| Setting suffix                                              | Values                                                            | Default           |
+| ----------------------------------------------------------- | ----------------------------------------------------------------- | ----------------- |
+| `codeTheme`                                                 | one-light, github-dark                                            | one-light         |
+| `paperSize`                                                 | A4, A5, Letter, Legal                                             | A4                |
+| `orientation`                                               | portrait, landscape                                               | portrait          |
+| `fontSize`                                                  | 8–24 pt (body text)                                               | 11                |
+| `marginTop` / `marginBottom` / `marginLeft` / `marginRight` | 5–40 mm each                                                      | 22 / 24 / 18 / 18 |
+| `pageNumbers`                                               | true / false                                                      | true              |
+| `pageNumberStyle`                                           | current-total (1 / 10), current (1), page-of-total (Page 1 of 10) | current-total     |
+| `inlineCodeBackground`                                      | Six-digit hex color                                               | #f1f3f5           |
+| `inlineCodeColor`                                           | Six-digit hex color                                               | #172b4d           |
+
+For example, use `localMarkdownPdf.paperSize`. Inline code colors apply to single-backtick code; fenced blocks use `codeTheme`. **Find next** navigates to the next matching page and highlights matching text. Issues appear as placeholders in the preview and in Problems; exporting them requires confirmation.
+
+The sole command is **Markdown: Export to PDF**. The former `localMarkdownPdf.exportAs` command has been removed; update custom keybindings to `localMarkdownPdf.export`.
 
 ## Supported content
 
@@ -159,15 +176,15 @@ Supported types: `NOTE`, `TIP`, `IMPORTANT`, `WARNING`, and `CAUTION`. Nested or
 Chromium, PDF.js, Shiki, KaTeX, Mermaid, styles, and fonts are included in the VSIX. The renderer blocks external requests and arbitrary document scripts; raw HTML is restricted to a small allowlist of text tags without attributes.
 
 - Local PNG, JPEG, GIF, and WebP images resolve relative to the Markdown file. Remote images must be downloaded manually and their references updated. Convert SVG image files to PNG; Mermaid-generated SVG is supported.
-- Missing images and invalid math or diagrams become visible placeholders only if you choose to continue. Inline diagnostics may point to the containing block’s first line.
+- Missing images and invalid math or diagrams appear as placeholders in the preview; exporting them requires confirmation. Inline diagnostics may point to the containing block’s first line.
 - Extremely large diagrams, wide formulas, tall table rows, rare characters, and emoji need visual review.
 - Copying wrapped Bash commands can introduce line breaks depending on the PDF reader. Check copied commands before running them.
-- Regenerate the preview after editing the source. Initial Chromium startup may take a few seconds.
+- Edits trigger regeneration after a 500 ms typing pause. Rendering takes additional time; export is disabled until the latest preview is ready, and the current page number is preserved. Initial Chromium startup may take a few seconds.
 - The interface is English; native dialogs follow the operating system and VS Code language settings.
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, formatting, tests, screenshot capture, and platform packaging. The manual **Package** GitHub Actions workflow uploads VSIX files and sample PDFs as workflow artifacts; it does not publish a release or Marketplace listing.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, formatting, tests, screenshot capture, and platform packaging. The **Check** workflow runs basic and integration checks for pull requests and pushes to `main`. The manual **Package** GitHub Actions workflow uploads VSIX files and sample PDFs as workflow artifacts; it does not publish a release or Marketplace listing.
 
 ## License
 

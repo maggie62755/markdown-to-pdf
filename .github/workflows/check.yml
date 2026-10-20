@@ -1,0 +1,38 @@
+name: Check
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run check
+      - run: npm test
+      - run: npm run prepare:browser
+      - run: node node_modules/playwright-core/cli.js install-deps chromium
+      - run: npm run build
+      - run: npm run smoke
+      - run: node scripts/bundle-check.cjs
+      - run: node scripts/preview-check.mjs
+      - name: Preview module failure
+        run: node scripts/preview-check.mjs
+        env:
+          TEST_PREVIEW_FAIL: module
+      - name: Preview worker failure
+        run: node scripts/preview-check.mjs
+        env:
+          TEST_PREVIEW_FAIL: worker

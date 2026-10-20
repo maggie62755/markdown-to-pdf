@@ -1,6 +1,7 @@
 import { readFile, mkdir, writeFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { exportPdf } from '../src/pdf';
+import { defaultLayout } from '../src/layout';
 async function main() {
   const root = process.cwd();
   await mkdir(path.join(root, 'output/pdf'), { recursive: true });
@@ -16,6 +17,41 @@ async function main() {
     },
     progress: console.log,
   });
+  for (const [name, layout] of [
+    [
+      'layout-landscape',
+      {
+        ...defaultLayout,
+        paperSize: 'Letter' as const,
+        orientation: 'landscape' as const,
+        fontSize: 16,
+        marginLeft: 30,
+        pageNumbers: false,
+        inlineCodeBackground: '#ffeebb',
+        inlineCodeColor: '#663300',
+      },
+    ],
+    [
+      'layout-a5',
+      {
+        ...defaultLayout,
+        paperSize: 'A5' as const,
+        pageNumberStyle: 'page-of-total' as const,
+      },
+    ],
+  ] as const) {
+    await exportPdf({
+      source: 'Layout body text.\n\n`Inline color sample`',
+      filename,
+      root,
+      layout,
+      output: path.join(root, `output/pdf/${name}.pdf`),
+      onIssues: async (issues) => {
+        if (issues.length) throw new Error(JSON.stringify(issues));
+        return true;
+      },
+    });
+  }
   const errors = path.join(root, 'fixtures/錯誤範例.md');
   await exportPdf({
     source: await readFile(errors, 'utf8'),
