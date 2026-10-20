@@ -1,10 +1,39 @@
 name: Package
 on:
   workflow_dispatch:
+  push:
+    tags: ['v*']
 permissions:
   contents: read
+concurrency:
+  group: package-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - name: Validate release version
+        if: github.event_name == 'push'
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
+          const lock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
+          if (!/^\d+\.\d+\.\d+$/.test(pkg.version) ||
+              process.env.RELEASE_TAG !== `v${pkg.version}` ||
+              lock.version !== pkg.version || lock.packages[''].version !== pkg.version) {
+            throw new Error('Release tag must be vX.Y.Z and match package.json and package-lock.json.');
+          }
+          JS
   package:
+    needs: validate
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -36,3 +65,31 @@ jobs:
             *.vsix
             output/pdf/*.pdf
           if-no-files-found: error
+      - name: Upload release installers
+        if: github.event_name == 'push' && matrix.os != 'ubuntu-24.04'
+        uses: actions/upload-artifact@v6
+        with:
+          name: release-vsix-${{ matrix.os }}
+          path: '*.vsix'
+          compression-level: 0
+          if-no-files-found: error
+  release:
+    if: github.event_name == 'push'
+    needs: package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: release-vsix-*
+          path: release-assets
+          merge-multiple: true
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: bash .github/scripts/publish-release.sh

@@ -88,7 +88,21 @@ This builds once, verifies bundled Chromium can launch, then creates `markdown-t
 
 The **Check** workflow runs on every pull request and pushes to `main`: formatting, type checks, unit tests, Chromium PDF smoke tests, export flow tests, and preview interaction/failure tests on Ubuntu.
 
-The **Package** GitHub Actions workflow can be triggered manually after uploading the repository. Each native runner prepares Chromium, checks code, renders sample PDFs, exercises export/preview, and uploads artifacts. CI is not a replacement for installing the VSIX and testing native save dialogs and offline use on actual target devices.
+The **Package** GitHub Actions workflow runs manually or when a `v*` tag is pushed. Each native runner prepares Chromium, checks code, renders sample PDFs, exercises export/preview, and uploads artifacts. A manual run only creates workflow artifacts. A version tag also publishes a GitHub Release after all five runners pass, attaching four VSIX installers (Apple Silicon Mac, Intel Mac, Windows x64, Linux x64). The Linux release installer comes from Ubuntu 22.04; Ubuntu 24.04 is an additional validation runner. CI is not a replacement for installing the VSIX and testing native save dialogs and offline use on actual target devices.
+
+### Publishing a GitHub Release
+
+1. Update `package.json` and `package-lock.json` to the intended version (for a new version, use `npm version patch --no-git-tag-version`). Commit all release changes and push them to `main`.
+2. Create and push a matching tag. For the current version, after committing and pushing:
+
+   ```sh
+   git tag v0.2.4
+   git push origin v0.2.4
+   ```
+
+3. Watch **Actions → Package**. The tag must match both package files exactly (`vX.Y.Z`). After all builds succeed, the workflow creates release notes, uploads all four installers to a draft, and publishes it automatically.
+
+The workflow uses GitHub's built-in `GITHUB_TOKEN`; no personal token is needed. Only the release job receives `contents: write`. It does not publish to the VS Code Marketplace. If an upload fails, the release stays a draft; rerun the failed job. An already published release is never overwritten: use a new version and tag for changes. Ordinary pushes to `main` run checks without publishing a release.
 
 ## Preparing a GitHub repository
 
@@ -97,7 +111,8 @@ The **Package** GitHub Actions workflow can be triggered manually after uploadin
 - `package.json` points to `maggie62755/markdown-to-pdf`. Keep `repository`, `bugs`, `homepage`, and README clone commands synchronized if the repository moves.
 - Keep relative links in the source README for GitHub. VSIX packaging rewrites them to public GitHub URLs on the `main` branch (raw URLs for images, blob URLs for documents). Push referenced images and documents before distributing a VSIX; the extension Details page needs network access to display these remote images. PDF preview and export remain local and offline.
 - Keep platform validation status accurate; Windows, Ubuntu and Intel Mac native acceptance is still pending.
-- This project currently uses the local publisher identifier `local-tools`; Marketplace publication requires a separately configured publisher and release process.
+- The Marketplace publisher identifier is `MaggieTseng`, matching `package.json`. The package name is `maggietseng-markdown-to-pdf` (display name: **Easy Markdown to PDF**). Upload the generated VSIX under this publisher.
+- `fixtures/` stays in Git for examples and tests but is excluded from the VSIX. The extension does not need these files at runtime; excluding them also avoids Marketplace upload collisions when Unicode filenames are decoded incorrectly.
 
 ### README images
 

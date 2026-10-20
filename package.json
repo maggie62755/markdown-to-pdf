@@ -1,9 +1,9 @@
 {
-  "name": "markdown-to-pdf",
-  "displayName": "Markdown to PDF",
-  "description": "Preview and export Markdown to PDF locally in VS Code.",
+  "name": "maggietseng-markdown-to-pdf",
+  "displayName": "Easy Markdown to PDF",
+  "description": "Turn Markdown into PDF with live preview and simple layout settings, entirely on your computer.",
   "version": "0.2.4",
-  "publisher": "local-tools",
+  "publisher": "MaggieTseng",
   "license": "MIT",
   "engines": {
     "vscode": "^1.95.0"

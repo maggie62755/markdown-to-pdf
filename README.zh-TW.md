@@ -1,8 +1,8 @@
 ![Markdown to PDF](docs/images/logo.png)
 
-# Markdown to PDF
+# Easy Markdown to PDF
 
-**VS Code 擴充套件：在本機預覽 Markdown，確認後匯出 PDF。**
+**在 VS Code 輕鬆將 Markdown 轉成 PDF。即時預覽、簡單排版，全程在本機完成。**
 
 ![VS Code Extension](docs/images/badges/vscode.png)
 ![Local Rendering](docs/images/badges/local.png)
@@ -97,7 +97,7 @@ npm run package
 
 ### 4. 安裝到 VS Code
 
-若先前已安裝 **Local Markdown PDF**，請先解除安裝，再安裝 **Markdown to PDF**。套件識別碼已變更，VS Code 會視為不同擴充套件；匯出命令為 `localMarkdownPdf.export`；既有的 `localMarkdownPdf` 設定名稱繼續保留。
+若先前已安裝 **Local Markdown PDF** 或識別碼為 `local-tools.markdown-to-pdf` 的開發版本，請先解除安裝，再安裝此版本。套件識別碼現為 `MaggieTseng.maggietseng-markdown-to-pdf`，VS Code 會視為不同擴充套件；匯出命令為 `localMarkdownPdf.export`；既有的 `localMarkdownPdf` 設定名稱繼續保留。
 
 1. 開啟 VS Code，macOS 按 **Cmd+Shift+P**，Windows／Linux 按 **Ctrl+Shift+P**。
 2. 執行 **Extensions: Install from VSIX…**。
@@ -181,6 +181,6 @@ VSIX 包含 Chromium、PDF.js、Shiki、KaTeX、Mermaid、樣式與字型。渲�
 
 ## 開發與授權
 
-安裝依賴、格式化、測試、截圖重拍及各平台打包方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。GitHub Actions 的 **Check** 會在 PR 與推送至 `main` 時執行基本與整合檢查；手動 **Package** 工作流程會上傳 VSIX 與範例 PDF，並不會自動發佈 Release 或 Marketplace。
+安裝依賴、格式化、測試、截圖重拍及各平台打包方式見 [CONTRIBUTING.md](CONTRIBUTING.md)。GitHub Actions 的 **Check** 會在 PR 與推送至 `main` 時執行基本與整合檢查；推送與套件版本一致的標籤（例如 `v0.2.4`）後，**Package** 會自動打包，所有平台檢查通過後建立 GitHub Release，附上四種平台的 VSIX。手動執行只產生工作流程附件。操作方式見 [Release 發佈說明](CONTRIBUTING.md#publishing-a-github-release)；Marketplace 上架仍需另外處理。
 
 採用 [MIT 授權](LICENSE)；字型保留 OFL 授權，建置產物包含第三方授權聲明。

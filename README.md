@@ -1,8 +1,8 @@
 ![Markdown to PDF](docs/images/logo.png)
 
-# Markdown to PDF
+# Easy Markdown to PDF
 
-**A VS Code extension to preview and export Markdown as PDF — entirely on your computer.**
+**Turn Markdown into PDF with ease. Live preview, simple layout settings, and local processing in VS Code.**
 
 ![VS Code Extension](docs/images/badges/vscode.png)
 ![Local Rendering](docs/images/badges/local.png)
@@ -97,7 +97,7 @@ This command builds the extension, bundles local resources, checks that Chromium
 
 ### 4. Install in VS Code
 
-If you installed the earlier **Local Markdown PDF** extension, uninstall it before installing **Markdown to PDF**. The package identifier has changed, so VS Code treats it as a separate extension. The export command is `localMarkdownPdf.export`; existing `localMarkdownPdf` setting keys are retained.
+If you installed the earlier **Local Markdown PDF** extension or a development build published as `local-tools.markdown-to-pdf`, uninstall it before installing this build. The package identifier is now `MaggieTseng.maggietseng-markdown-to-pdf`, so VS Code treats it as a separate extension. The export command is `localMarkdownPdf.export`; existing `localMarkdownPdf` setting keys are retained.
 
 1. Open VS Code and press **Cmd+Shift+P** on macOS or **Ctrl+Shift+P** on Windows/Linux.
 2. Run **Extensions: Install from VSIX…**.
@@ -184,7 +184,7 @@ Chromium, PDF.js, Shiki, KaTeX, Mermaid, styles, and fonts are included in the V
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, formatting, tests, screenshot capture, and platform packaging. The **Check** workflow runs basic and integration checks for pull requests and pushes to `main`. The manual **Package** GitHub Actions workflow uploads VSIX files and sample PDFs as workflow artifacts; it does not publish a release or Marketplace listing.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, formatting, tests, screenshot capture, and platform packaging. The **Check** workflow runs basic and integration checks for pull requests and pushes to `main`. The **Package** workflow builds installers automatically when a matching version tag (such as `v0.2.4`) is pushed. After all platform checks pass, it publishes a GitHub Release with four platform-specific VSIX files. Manual runs only upload workflow artifacts. See [release instructions](CONTRIBUTING.md#publishing-a-github-release); Marketplace publication is separate.
 
 ## License
 

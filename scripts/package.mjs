@@ -1,5 +1,22 @@
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+const manifest = JSON.parse(readFileSync('package.json', 'utf8'));
+const icon = readFileSync(resolve(manifest.icon));
+if (
+  icon.length < 24 ||
+  icon.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a' ||
+  icon.toString('ascii', 12, 16) !== 'IHDR'
+) {
+  throw new Error('The extension icon must be a PNG with a valid IHDR header.');
+}
+const iconWidth = icon.readUInt32BE(16);
+const iconHeight = icon.readUInt32BE(20);
+if (!iconWidth || !iconHeight || iconWidth > 1024 || iconHeight > 1024) {
+  throw new Error(
+    `Extension icon is ${iconWidth} × ${iconHeight}; Marketplace allows at most 1024 × 1024 pixels.`,
+  );
+}
 const build = spawnSync(process.execPath, ['scripts/build.mjs'], {
   stdio: 'inherit',
 });
