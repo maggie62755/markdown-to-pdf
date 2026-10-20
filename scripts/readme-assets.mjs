@@ -32,12 +32,10 @@ try {
       },
       { label, value, color },
     );
-    await page
-      .locator('div')
-      .screenshot({
-        path: `docs/images/badges/${file}.png`,
-        omitBackground: true,
-      });
+    await page.locator('div').screenshot({
+      path: `docs/images/badges/${file}.png`,
+      omitBackground: true,
+    });
   }
   const icon = await readFile('assets/icon.png');
   await page.setContent(
